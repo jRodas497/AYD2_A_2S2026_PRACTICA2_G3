@@ -1,0 +1,21 @@
+# Todo lo que cambia entre entornos llega por variables de entorno (las exporta scripts/desplegar.sh);
+# así las contraseñas no se escriben en archivos del repositorio.
+ecr_registry: "{{ lookup('env', 'ECR_REGISTRY') }}"
+ecr_prefix: "{{ lookup('env', 'ECR_PREFIX') | default('ayd-libreria', true) }}"
+ecr_token: "{{ lookup('env', 'ECR_TOKEN') }}"
+image_tag: "{{ lookup('env', 'IMAGE_TAG') | default('latest', true) }}"
+
+red_docker: ayd
+
+libros_private_ip: "{{ lookup('env', 'LIBROS_PRIVATE_IP') }}"
+ventas_private_ip: "{{ lookup('env', 'VENTAS_PRIVATE_IP') }}"
+
+libros_db_host: "{{ lookup('env', 'LIBROS_DB_HOST') }}"
+libros_db_name: libros
+libros_db_user: libros
+libros_db_password: "{{ lookup('env', 'LIBROS_DB_PASSWORD') }}"
+
+ventas_db_host: "{{ lookup('env', 'VENTAS_DB_HOST') }}"
+ventas_db_name: ventas
+ventas_db_user: ventas
+ventas_db_password: "{{ lookup('env', 'VENTAS_DB_PASSWORD') }}"

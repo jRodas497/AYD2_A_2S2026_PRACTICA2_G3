@@ -1,0 +1,52 @@
+- name: Copiar el esquema de la base
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../servicios/libros/db/schema.sql"
+    dest: /opt/ayd-libros-schema.sql
+    mode: "0644"
+
+# El esquema se puede aplicar varias veces sin duplicar datos, así que esta tarea no cuenta como cambio.
+- name: Aplicar el esquema en la base de Libros
+  ansible.builtin.command:
+    argv:
+      - docker
+      - run
+      - --rm
+      - -e
+      - PGPASSWORD={{ libros_db_password }}
+      - -v
+      - /opt/ayd-libros-schema.sql:/schema.sql:ro
+      - postgres:16-alpine
+      - psql
+      - -h
+      - "{{ libros_db_host }}"
+      - -U
+      - "{{ libros_db_user }}"
+      - -d
+      - "{{ libros_db_name }}"
+      - -v
+      - ON_ERROR_STOP=1
+      - -f
+      - /schema.sql
+  register: esquema
+  retries: 5
+  delay: 10
+  until: esquema.rc == 0
+  changed_when: false
+  no_log: true
+
+- name: Contenedor de Libros
+  community.docker.docker_container:
+    name: libros
+    image: "{{ ecr_registry }}/{{ ecr_prefix }}/libros:{{ image_tag }}"
+    pull: always
+    state: started
+    restart_policy: unless-stopped
+    published_ports:
+      - "8081:8081"
+    env:
+      DB_HOST: "{{ libros_db_host }}"
+      DB_PORT: "5432"
+      DB_NAME: "{{ libros_db_name }}"
+      DB_USER: "{{ libros_db_user }}"
+      DB_PASSWORD: "{{ libros_db_password }}"
+  no_log: true

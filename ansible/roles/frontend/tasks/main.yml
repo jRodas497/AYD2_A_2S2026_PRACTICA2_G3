@@ -1,0 +1,30 @@
+- name: Red de Docker compartida por frontend y gateway
+  community.docker.docker_network:
+    name: "{{ red_docker }}"
+
+# Solo el gateway publica el puerto 80; el frontend queda interno en la red de Docker.
+- name: Contenedor del frontend
+  community.docker.docker_container:
+    name: frontend
+    image: "{{ ecr_registry }}/{{ ecr_prefix }}/frontend:{{ image_tag }}"
+    pull: always
+    state: started
+    restart_policy: unless-stopped
+    networks:
+      - name: "{{ red_docker }}"
+
+- name: Contenedor del gateway
+  community.docker.docker_container:
+    name: gateway
+    image: "{{ ecr_registry }}/{{ ecr_prefix }}/gateway:{{ image_tag }}"
+    pull: always
+    state: started
+    restart_policy: unless-stopped
+    published_ports:
+      - "80:80"
+    networks:
+      - name: "{{ red_docker }}"
+    env:
+      LIBROS_HOST: "{{ libros_private_ip }}"
+      VENTAS_HOST: "{{ ventas_private_ip }}"
+      FRONTEND_HOST: frontend
