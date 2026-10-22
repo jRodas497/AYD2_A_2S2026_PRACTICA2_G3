@@ -4,7 +4,7 @@
 
 | Pieza | Dónde | Estado |
 |---|---|---|
-| CI (Libros, frontend, imágenes, Terraform, Ansible) | `.github/workflows/ci.yml` | Funcionando |
+| CI (Libros, frontend, imágenes, Terraform, Ansible) | `.github/workflows/ci.yml` | Funcionando; el frontend ya compila |
 | CD (subir a ECR y desplegar con Ansible) | `.github/workflows/cd.yml` | Apagado hasta `AWS_DEPLOY_ENABLED=true` |
 | Terraform: proveedor, variables, ECR, outputs | `terraform/` | Validado. Falta red, cómputo, RDS y balanceador |
 | Ansible: Docker, ECR, esquemas de BD, contenedores | `ansible/` | Validado con `--syntax-check`; sin probar contra una EC2 real |
@@ -63,7 +63,6 @@ Si la cuenta no deja crear IAM, el flujo ya no lo necesita: usa claves de acceso
 6. Activar el CD.
 7. Al terminar la calificación: `terraform destroy` y revisar en la consola que no queden instancias, IP elásticas, balanceadores ni bases.
 
-## Pendientes de otros
+## Servicios
 
-- **Frontend (Ricardo):** no compila todavía (faltan `App`, los tipos de `Libro` y el repositorio HTTP). Hasta entonces falla su job en CI y su imagen en CD.
-- **Ventas (Ricardo):** necesita `Dockerfile` y `db/schema.sql`; el rol de Ansible `ventas` los espera en `servicios/ventas/`. La BD de Ventas usa usuario y base `ventas`.
+Libros, Ventas, frontend y gateway ya tienen Dockerfile y compilan. Cada base usa usuario y nombre igual al del servicio (`libros`, `ventas`), que es lo que esperan los roles de Ansible, y Ventas se conecta a Libros con `LIBROS_URL`.

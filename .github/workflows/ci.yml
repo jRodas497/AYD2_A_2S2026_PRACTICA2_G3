@@ -23,9 +23,13 @@ defaults:
     shell: bash
 
 jobs:
-  libros:
-    name: Libros (Maven)
+  java:
+    name: ${{ matrix.servicio }} (Maven)
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        servicio: [libros, ventas]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -33,18 +37,14 @@ jobs:
           distribution: temurin
           java-version: "21"
           cache: maven
-          cache-dependency-path: servicios/libros/pom.xml
+          cache-dependency-path: servicios/${{ matrix.servicio }}/pom.xml
       - name: mvn verify
-        working-directory: servicios/libros
+        working-directory: servicios/${{ matrix.servicio }}
         run: mvn -B verify
 
   frontend:
     name: Frontend (tsc, Vitest, oxlint, build)
     runs-on: ubuntu-latest
-    # El frontend todavía es la base copiada de la Fase 3 y no compila (faltan App, tipos de Libro y
-    # el repositorio HTTP). Mientras se adapta, su fallo no bloquea el resto. Quitar esta línea
-    # cuando el frontend compile.
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -71,8 +71,7 @@ jobs:
   imagenes:
     name: Imagen ${{ matrix.servicio }}
     runs-on: ubuntu-latest
-    # Solo valida que el Dockerfile construye; no sube nada. El frontend sigue la misma suerte que su job.
-    continue-on-error: ${{ matrix.servicio == 'frontend' }}
+    # Solo valida que el Dockerfile construye; no sube nada.
     strategy:
       fail-fast: false
       matrix:
