@@ -1,0 +1,19 @@
+server:
+  port: ${PORT:8081}
+  error:
+    # Sin esto los errores 400, 404 y 409 salen sin el campo "message".
+    include-message: always
+    include-binding-errors: always
+
+spring:
+  application:
+    name: libros
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:libros}
+    username: ${DB_USER:libros}
+    password: ${DB_PASSWORD:libros_dev}
+  jpa:
+    open-in-view: false
+    hibernate:
+      # El esquema lo crea db/schema.sql; Hibernate nunca toca las tablas.
+      ddl-auto: none
