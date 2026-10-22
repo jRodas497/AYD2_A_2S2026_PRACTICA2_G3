@@ -1,45 +1,45 @@
 # Reparto del trabajo
 
-Entrega el 22 de octubre de 2026 a las 18:00, calificación el 24. Somos dos: Ricardo (9516085) y Juan José, que tiene la cuenta de AWS.
+Entrega el 22 de octubre de 2026 a las 18:00, calificación el 24. Todos los integrantes necesitan commits propios y deben estar presentes en la calificación.
 
 ## Estado
 
-Ya está en `develop` el servicio de Libros (probado en local), el gateway nginx y un `docker-compose.yml` con Libros y el gateway. Faltan Ventas, el frontend, toda la infraestructura y los dos documentos.
+Está en `develop` y probado en local: servicios de Libros y Ventas, frontend, gateway, `docker-compose.yml`, manual de usuario, diagrama de despliegue, arquitectura y README. También hay CI y CD (apagado), scripts de despliegue, roles de Ansible y los repositorios de ECR en Terraform.
 
-Ventas, el frontend y el compose local ya funcionan juntos. Falta toda la infraestructura. Si el tiempo aprieta, Ricardo toma Ansible.
+Falta el resto de Terraform (red, seguridad, máquinas, bases y balanceador), el despliegue real y las pruebas.
 
-## Ricardo
+## Quién hace qué
 
-- Servicio de Ventas: registro de ventas, listado, ranking, llamada a Libros para descontar existencias, `schema.sql` y Dockerfile.
-- Frontend: listado con buscador, detalle con registro de venta y ranking, con su Dockerfile. Llama siempre a rutas relativas (`/api/libros`, `/api/ventas`).
-- Compose local completo, para probar todo junto antes de subir nada.
-- Manual de usuario y borrador del diagrama de despliegue.
+| Integrante | Carnet | Tarea |
+|---|---|---|
+| Juan José Rodas Mansilla | 202200389 | `compute.tf`, `database.tf` y `alb.tf` de Terraform; despliegue con Ansible y verificación en la nube |
+| Williams Bramlley Constanza Oscal | 199919737 | `network.tf` y `security.tf` de Terraform: VPC, dos subredes públicas y dos privadas, rutas y grupos de seguridad según la tabla de [aws.md](aws.md) |
+| Carmen Maria Marroquin Llamas | 202001132 | Pruebas de Libros: búsqueda con acentos y comodines, 404, descuento de existencias y 409 |
+| Sebastian Alejandro Vasquez Cartagena | 202109114 | Pruebas de Ventas con Libros simulado: descuento, rechazo y compensación si falla el guardado |
+| Hernan Ricardo Avila Castillo | 9516085 | Servicios, frontend, gateway, compose y documentación; `scripts/verificar.sh` |
 
-## Juan José
+Williams y Juan José acuerdan los nombres de los outputs de la red (`vpc_id`, subredes públicas y privadas, grupos de seguridad) antes de escribir sus archivos. `terraform validate` no necesita cuenta de AWS; `plan` y `apply` sí.
 
-- Terraform en `terraform/`: VPC con dos subredes públicas y dos privadas, grupos de seguridad, tres EC2 con IP elástica (frontend y gateway, libros, ventas), balanceador en el puerto 80 hacia la máquina del gateway, dos RDS PostgreSQL 16 sin acceso público y cuatro repositorios en ECR (libros, ventas, frontend y gateway). Todo con la etiqueta `proyecto = ayd-libreria`.
-- `scripts/construir-y-subir.sh`: construye con `--platform linux/amd64` y sube a ECR.
-- Ansible en `ansible/` y `scripts/desplegar.sh`: instala Docker, configura el sistema y levanta los contenedores. Una segunda corrida no debe cambiar nada.
-- Ajustar el diagrama de despliegue con lo que Terraform realmente cree, y la verificación final en la nube.
-
-## Contrato entre las dos partes
+## Contrato entre las partes
 
 | Componente | Puerto | Salud | Variables |
 |---|---|---|---|
 | Libros | 8081 | `/health` | `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` |
 | Ventas | 8082 | `/health` | las mismas y `LIBROS_URL` |
-| Frontend | 80 | `/` | ninguna |
+| Frontend | 80 | `/health` | ninguna |
 | Gateway | 80 | `/health` | `LIBROS_HOST`, `VENTAS_HOST`, `FRONTEND_HOST` |
 
-El balanceador usa `/health` como chequeo hacia el gateway. Cada servicio trae su `db/schema.sql`, que se puede aplicar varias veces sin duplicar datos. Las contraseñas de las bases las genera Terraform con `random_password` y no van al repositorio.
-
-## Antes de empezar con AWS
-
-Juan José corre `aws sts get-caller-identity` y confirma que es su cuenta. Revisa si deja crear roles IAM y los límites de IP elásticas y RDS. Si es una cuenta educativa sin roles, Ansible hace `docker login` a ECR con un token temporal. Ansible en Windows solo corre con WSL.
+El balanceador usa `/health` como chequeo hacia el gateway. Las rutas de cada API están en [arquitectura.md](arquitectura.md).
 
 ## Git
 
 Ramas `feature/<carnet>-<tema>` que salen de `develop`, un tema por rama. Commits con el formato `<carnet>: mensaje`, sin pies de página. Los PR se mezclan sin borrar la rama. Un merge de PR no cuenta como commit válido, así que cada quien necesita commits propios en sus ramas.
+
+## Antes de la calificación
+
+- Aceptar la invitación al repositorio y revisar que el último `develop` compile.
+- Con la infraestructura arriba, correr `scripts/verificar.sh` y repetir las capturas del manual contra el balanceador.
+- Todos presentes el día de la calificación.
 
 ## Al terminar
 
