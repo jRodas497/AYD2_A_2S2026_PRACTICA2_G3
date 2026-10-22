@@ -6,10 +6,12 @@ Entrega el 22 de octubre de 2026 a las 18:00, calificación el 24. Somos dos: Ri
 
 Ya está en `develop` el servicio de Libros (probado en local), el gateway nginx y un `docker-compose.yml` con Libros y el gateway. Faltan Ventas, el frontend, toda la infraestructura y los dos documentos.
 
+Ventas, el frontend y el compose local ya funcionan juntos. Falta toda la infraestructura. Si el tiempo aprieta, Ricardo toma Ansible.
+
 ## Ricardo
 
 - Servicio de Ventas: registro de ventas, listado, ranking, llamada a Libros para descontar existencias, `schema.sql` y Dockerfile.
-- Frontend: listado con buscador, detalle y ranking, con su Dockerfile.
+- Frontend: listado con buscador, detalle con registro de venta y ranking, con su Dockerfile. Llama siempre a rutas relativas (`/api/libros`, `/api/ventas`).
 - Compose local completo, para probar todo junto antes de subir nada.
 - Manual de usuario y borrador del diagrama de despliegue.
 
