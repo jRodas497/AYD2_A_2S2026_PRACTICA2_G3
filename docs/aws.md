@@ -12,6 +12,12 @@
 | Despliegue | `scripts/desplegar.sh` | Sin probar contra EC2 |
 | Revisión de cuenta y herramientas | `scripts/preflight-aws.sh` | Solo lecturas |
 
+## Cuenta compartida: región y recursos ajenos
+
+La cuenta de AWS la comparte alguien más. En `us-east-1` ya hay una infraestructura que **no es nuestra** (`libreria-ayd-*`: VPC, 3 EC2, 2 RDS, balanceador y las claves `Practica2_AYD2` y `Claves_Proyecto_AYD2`) y que tiene ocupadas las 5 IP elásticas de esa región. No se toca ni se borra.
+
+Nuestro despliegue va en **`us-east-2` (Ohio)**, que estaba vacía, con nombres `ayd-libreria-*` y la etiqueta `proyecto = ayd-libreria`. Las IP elásticas y los pares de claves son por región, así que no chocan con lo anterior.
+
 ## Antes de tocar AWS
 
 1. `scripts/preflight-aws.sh`: revisa herramientas, identidad (`aws sts get-caller-identity`), permisos de lectura, IAM, IP elásticas y claves SSH.

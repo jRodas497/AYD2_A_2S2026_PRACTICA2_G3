@@ -3,7 +3,7 @@
 # No crea ni modifica nada. Uso: scripts/preflight-aws.sh
 cd "$(dirname "$0")/.."
 
-REGION="${AWS_REGION:-us-east-1}"
+REGION="${AWS_REGION:-us-east-2}"
 fallos=0
 ok()   { printf '  [ OK ] %s\n' "$1"; }
 aviso() { printf '  [AVISO] %s\n' "$1"; }

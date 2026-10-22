@@ -8,7 +8,7 @@ El archivo editable está en [diagramas/despliegue-p2.drawio](diagramas/desplieg
 
 ## Componentes
 
-Todo vive en una VPC en `us-east-1`, dividida en subredes públicas y privadas repartidas en dos zonas de disponibilidad.
+Todo vive en una VPC en `us-east-2`, dividida en subredes públicas y privadas repartidas en dos zonas de disponibilidad.
 
 - **Application Load Balancer:** recibe el tráfico de internet por el puerto 80 y lo envía al gateway. Revisa la salud con `/health`.
 - **VM Frontend:** corre dos contenedores en una red de Docker. El gateway (nginx) publica el puerto 80 y el frontend queda interno.

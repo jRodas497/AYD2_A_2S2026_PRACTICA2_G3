@@ -11,7 +11,7 @@ for variable in FRONTEND_IP LIBROS_IP VENTAS_IP LIBROS_PRIVATE_IP VENTAS_PRIVATE
   [ -n "${!variable:-}" ] || { echo "Falta la variable ${variable}" >&2; exit 1; }
 done
 
-REGION="${AWS_REGION:-us-east-1}"
+REGION="${AWS_REGION:-us-east-2}"
 CUENTA="$(aws sts get-caller-identity --query Account --output text)"
 export ECR_REGISTRY="${CUENTA}.dkr.ecr.${REGION}.amazonaws.com"
 export ECR_TOKEN="$(aws ecr get-login-password --region "$REGION")"
