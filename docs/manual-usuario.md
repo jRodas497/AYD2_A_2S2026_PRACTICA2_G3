@@ -6,15 +6,15 @@ Guía para consultar el catálogo de la Librería AYD, buscar libros, registrar 
 
 Abre en el navegador la dirección que te entregó el equipo, que es el nombre DNS del balanceador de carga (por ejemplo `http://<nombre-del-balanceador>`). Se abre el catálogo.
 
-La barra verde de arriba tiene dos opciones: **Catálogo** y **Ranking**. La opción activa aparece resaltada en blanco.
+La barra de arriba tiene dos opciones: **Catálogo** y **Ranking**. La opción activa aparece resaltada en una píldora oscura.
 
 ## Ver el listado de libros
 
-El catálogo muestra todos los libros en tarjetas. Cada tarjeta indica el título, el autor, el precio en quetzales y cuántos ejemplares hay disponibles.
+El catálogo muestra todos los libros en una lista, con el total de libros arriba a la derecha. Cada fila tiene una portada con la inicial del título, el título, el autor, las existencias y el precio en quetzales.
 
 ![Catálogo de libros](capturas/01-catalogo.jpg)
 
-Si un libro se agota, la tarjeta muestra **Agotado** en rojo en lugar de las existencias.
+El estado de las existencias lleva un punto de color: verde cuando hay disponibles, naranja con **Quedan N** cuando son cinco o menos, y rojo con **Agotado** cuando no hay.
 
 ## Buscar por título o autor
 
@@ -22,17 +22,17 @@ Escribe en el cuadro **Buscar por título o autor** y la lista se filtra mientra
 
 ![Búsqueda de libros por autor](capturas/02-busqueda.jpg)
 
-Si no hay coincidencias, aparece el mensaje **No se encontraron libros**. Para volver a ver todo, borra el texto del cuadro.
+Si no hay coincidencias, aparece un mensaje que indica que ningún libro coincide con lo escrito. Para volver a ver todo, borra el texto del cuadro.
 
 ## Ver el detalle de un libro
 
-Haz clic en una tarjeta para abrir el detalle: título, autor, precio y existencias. Para regresar usa **Volver al catálogo**.
+Haz clic en una fila para abrir el detalle: portada, título, autor, precio y existencias, con el panel **Registrar venta** a la derecha. Para regresar usa **Volver al catálogo**.
 
 ![Detalle de un libro](capturas/03-detalle.jpg)
 
 ## Registrar una venta
 
-En el detalle, elige la cantidad con los botones **−** y **+** (no puede superar las existencias) y pulsa **Registrar venta**.
+En el panel **Registrar venta** del detalle, elige la cantidad con los botones **−** y **+** (no puede superar las existencias). El **Total** se actualiza al cambiar la cantidad. Pulsa **Registrar venta**.
 
 ![Venta registrada](capturas/04-venta-registrada.jpg)
 
