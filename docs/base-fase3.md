@@ -27,10 +27,6 @@ Todo lleva nombres de SGO-Logic (`com.sgologic`, `sgologic-backend`, `FASE 2/...
 - `db/migrate.sh` y `aplicar-migraciones-nube.sh`: aplicar SQL a una base administrada desde un contenedor `postgres:16-alpine`. La idea se reutiliza en el rol de Ansible; los scripts dependen de las migraciones de SGO-Logic y de dos roles de base que acá no se usan.
 - `ci/ci.yml`: pruebas de backend y frontend en GitHub Actions. Como plantilla, quitar el job de e2e y la Fase 3.
 
-## Diagramas
-
-`diagramas/Diagrama-Despliegue-Fase2.drawio` es el diagrama de despliegue de la Fase 2, para tomar el estilo de dibujo en draw.io. El de la práctica es distinto (nube, VPC, balanceador, Terraform y Ansible).
-
 ## Lo que no se copió
 
 Kafka, outbox, proveedores simulados, autenticación, reservas, crédito, migraciones y el resto de módulos de SGO-Logic: no los usa la práctica.
