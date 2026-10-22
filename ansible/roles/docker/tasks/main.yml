@@ -1,6 +1,8 @@
-- name: Instalar Docker Engine
+- name: Instalar Docker Engine y la librería que usan los módulos de Docker de Ansible
   ansible.builtin.dnf:
-    name: docker
+    name:
+      - docker
+      - python3-requests
     state: present
 
 - name: Arrancar Docker y habilitarlo al iniciar
