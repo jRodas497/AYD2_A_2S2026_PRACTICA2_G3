@@ -6,15 +6,17 @@ Entrega el 22 de octubre de 2026 a las 18:00, calificación el 24. Somos dos: Ri
 
 Ya está en `develop` el servicio de Libros (probado en local), el gateway nginx y un `docker-compose.yml` con Libros y el gateway. Faltan Ventas, el frontend, toda la infraestructura y los dos documentos.
 
+Juan José tiene el frontend además de la infraestructura, que es la parte más pesada. Si el tiempo aprieta, Ricardo toma Ansible cuando termine Ventas.
+
 ## Ricardo
 
 - Servicio de Ventas: registro de ventas, listado, ranking, llamada a Libros para descontar existencias, `schema.sql` y Dockerfile.
-- Frontend: listado con buscador, detalle y ranking, con su Dockerfile.
 - Compose local completo, para probar todo junto antes de subir nada.
 - Manual de usuario y borrador del diagrama de despliegue.
 
 ## Juan José
 
+- Frontend: listado con buscador, detalle y ranking, con su Dockerfile. Llama siempre a rutas relativas (`/api/libros`, `/api/ventas/ranking`). Parte de `servicios/frontend/`, que trae la configuración de la Fase 3; el código del catálogo hay que adaptarlo a `Libro`.
 - Terraform en `terraform/`: VPC con dos subredes públicas y dos privadas, grupos de seguridad, tres EC2 con IP elástica (frontend y gateway, libros, ventas), balanceador en el puerto 80 hacia la máquina del gateway, dos RDS PostgreSQL 16 sin acceso público y cuatro repositorios en ECR (libros, ventas, frontend y gateway). Todo con la etiqueta `proyecto = ayd-libreria`.
 - `scripts/construir-y-subir.sh`: construye con `--platform linux/amd64` y sube a ECR.
 - Ansible en `ansible/` y `scripts/desplegar.sh`: instala Docker, configura el sistema y levanta los contenedores. Una segunda corrida no debe cambiar nada.
