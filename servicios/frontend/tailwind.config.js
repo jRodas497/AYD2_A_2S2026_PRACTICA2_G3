@@ -10,16 +10,17 @@ export default {
       },
       colors: {
         ink: '#22343A',
+        suave: '#5a6b70',
         brand: {
           DEFAULT: '#35858E',
           dark: '#276169',
         },
-        sage: '#7DA78C',
-        lime: '#C2D099',
-        crema: '#E6EEC9',
+        // El marco de la app: un paso de tono del verde de la marca; la hoja de trabajo queda en blanco.
+        marco: '#eef3f2',
+        borde: '#e4eae9',
         linea: '#cfd4d8',
         ok: '#2e7d32',
-        alerta: '#ef6c00',
+        alerta: '#b45309',
         falla: '#c62828',
       },
     },
