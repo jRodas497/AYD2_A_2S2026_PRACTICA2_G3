@@ -1,6 +1,6 @@
 name: ayd-libreria
 
-# Prueba local sin nube. Puertos propios (5433, 9081, 9080) para no chocar con otros proyectos.
+# Prueba local sin nube. Puertos propios (5433, 5434, 9081, 9082, 9080) para no chocar con otros proyectos.
 # Las contraseñas son solo de desarrollo; en AWS las genera Terraform.
 services:
   libros-db:
@@ -34,6 +34,43 @@ services:
       libros-db:
         condition: service_healthy
 
+  ventas-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ventas
+      POSTGRES_USER: ventas
+      POSTGRES_PASSWORD: ventas_dev
+    ports:
+      - "5434:5432"
+    volumes:
+      - ventas-datos:/var/lib/postgresql/data
+      - ./servicios/ventas/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ventas -d ventas"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  ventas:
+    build: ./servicios/ventas
+    environment:
+      DB_HOST: ventas-db
+      DB_PORT: "5432"
+      DB_NAME: ventas
+      DB_USER: ventas
+      DB_PASSWORD: ventas_dev
+      LIBROS_URL: http://libros:8081
+    ports:
+      - "9082:8082"
+    depends_on:
+      ventas-db:
+        condition: service_healthy
+      libros:
+        condition: service_started
+
+  frontend:
+    build: ./servicios/frontend
+
   gateway:
     build: ./servicios/gateway
     environment:
@@ -44,6 +81,9 @@ services:
       - "9080:80"
     depends_on:
       - libros
+      - ventas
+      - frontend
 
 volumes:
   libros-datos:
+  ventas-datos:
