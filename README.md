@@ -70,6 +70,7 @@ Las contraseñas de las bases no se guardan en el repositorio: Terraform las gen
 ## Documentación
 
 - [Manual de usuario](docs/manual-usuario.md)
+- [Arquitectura, contratos de las APIs y modelo de datos](docs/arquitectura.md)
 - [Diagrama de despliegue](docs/diagrama-despliegue.md)
 - [Guía de AWS, CI y CD](docs/aws.md)
 - [Reparto del trabajo](docs/reparto.md)
