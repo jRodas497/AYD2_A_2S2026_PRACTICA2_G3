@@ -1,0 +1,14 @@
+*.tfstate
+*.tfstate.*
+.terraform/
+*.tfvars
+*.tfplan
+inventario.ini
+.env
+node_modules/
+target/
+dist/
+.DS_Store
+.idea/
+CLAUDE.md
+.claude/
