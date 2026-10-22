@@ -14,6 +14,8 @@
 
 ## Cuenta compartida: región y recursos ajenos
 
+El detalle, con la tabla de nombres de todos los recursos de Terraform, está en [diagrama-despliegue.md](diagrama-despliegue.md#región-y-cuenta-compartida).
+
 La cuenta de AWS la comparte alguien más. En `us-east-1` ya hay una infraestructura que **no es nuestra** (`libreria-ayd-*`: VPC, 3 EC2, 2 RDS, balanceador y las claves `Practica2_AYD2` y `Claves_Proyecto_AYD2`) y que tiene ocupadas las 5 IP elásticas de esa región. No se toca ni se borra.
 
 Nuestro despliegue va en **`us-east-2` (Ohio)**, que estaba vacía, con nombres `ayd-libreria-*` y la etiqueta `proyecto = ayd-libreria`. Las IP elásticas y los pares de claves son por región, así que no chocan con lo anterior.
