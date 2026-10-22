@@ -6,7 +6,7 @@
 |---|---|---|
 | CI (Libros, frontend, imágenes, Terraform, Ansible) | `.github/workflows/ci.yml` | Funcionando; el frontend ya compila |
 | CD (subir a ECR y desplegar con Ansible) | `.github/workflows/cd.yml` | Apagado hasta `AWS_DEPLOY_ENABLED=true` |
-| Terraform: red, seguridad, cómputo, RDS, balanceador, ECR y outputs | `terraform/` | Validado y con `plan` correcto (55 por crear); sin aplicar |
+| Terraform: red, seguridad, cómputo, RDS, balanceador, ECR y outputs | `terraform/` | Aplicado en `us-east-2` (55 recursos) y verificado |
 | Ansible: Docker, ECR, esquemas de BD, contenedores | `ansible/` | Validado con `--syntax-check`; sin probar contra una EC2 real |
 | Build y push a ECR | `scripts/construir-y-subir.sh` | Sin probar contra ECR |
 | Despliegue | `scripts/desplegar.sh` | Sin probar contra EC2 |
@@ -19,6 +19,16 @@ El detalle, con la tabla de nombres de todos los recursos de Terraform, está en
 La cuenta de AWS la comparte alguien más. En `us-east-1` ya hay una infraestructura que **no es nuestra** (`libreria-ayd-*`: VPC, 3 EC2, 2 RDS, balanceador y las claves `Practica2_AYD2` y `Claves_Proyecto_AYD2`) y que tiene ocupadas las 5 IP elásticas de esa región. No se toca ni se borra.
 
 Nuestro despliegue va en **`us-east-2` (Ohio)**, que estaba vacía, con nombres `ayd-libreria-*` y la etiqueta `proyecto = ayd-libreria`. Las IP elásticas y los pares de claves son por región, así que no chocan con lo anterior.
+
+## Despliegue actual
+
+Desplegado el 22 de octubre de 2026 en `us-east-2`. La aplicación responde en el balanceador:
+
+`http://ayd-libreria-alb-2091800383.us-east-2.elb.amazonaws.com`
+
+`scripts/verificar.sh` contra esa dirección pasa completo: página, catálogo (15 libros), búsquedas, ranking, ventas con sus errores (404, 400 y 409), y comprobación de que Libros, Ventas y las bases no son accesibles desde internet. El balanceador reporta el gateway como `healthy`.
+
+La verificación registra una venta de un ejemplar del libro 1, así que sus existencias y el ranking ya no son los de la siembra inicial.
 
 ## Antes de tocar AWS
 
