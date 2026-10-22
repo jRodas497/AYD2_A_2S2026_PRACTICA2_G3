@@ -6,7 +6,7 @@
 |---|---|---|
 | CI (Libros, frontend, imágenes, Terraform, Ansible) | `.github/workflows/ci.yml` | Funcionando; el frontend ya compila |
 | CD (subir a ECR y desplegar con Ansible) | `.github/workflows/cd.yml` | Apagado hasta `AWS_DEPLOY_ENABLED=true` |
-| Terraform: proveedor, variables, ECR, outputs | `terraform/` | Validado. Falta red, cómputo, RDS y balanceador |
+| Terraform: red, seguridad, cómputo, RDS, balanceador, ECR y outputs | `terraform/` | Aplicado en `us-east-2` (55 recursos) y verificado |
 | Ansible: Docker, ECR, esquemas de BD, contenedores | `ansible/` | Validado con `--syntax-check`; sin probar contra una EC2 real |
 | Build y push a ECR | `scripts/construir-y-subir.sh` | Sin probar contra ECR |
 | Despliegue | `scripts/desplegar.sh` | Sin probar contra EC2 |
@@ -19,6 +19,16 @@ El detalle, con la tabla de nombres de todos los recursos de Terraform, está en
 La cuenta de AWS la comparte alguien más. En `us-east-1` ya hay una infraestructura que **no es nuestra** (`libreria-ayd-*`: VPC, 3 EC2, 2 RDS, balanceador y las claves `Practica2_AYD2` y `Claves_Proyecto_AYD2`) y que tiene ocupadas las 5 IP elásticas de esa región. No se toca ni se borra.
 
 Nuestro despliegue va en **`us-east-2` (Ohio)**, que estaba vacía, con nombres `ayd-libreria-*` y la etiqueta `proyecto = ayd-libreria`. Las IP elásticas y los pares de claves son por región, así que no chocan con lo anterior.
+
+## Despliegue actual
+
+Desplegado el 22 de octubre de 2026 en `us-east-2`. La aplicación responde en el balanceador:
+
+`http://ayd-libreria-alb-2091800383.us-east-2.elb.amazonaws.com`
+
+`scripts/verificar.sh` contra esa dirección pasa completo: página, catálogo (15 libros), búsquedas, ranking, ventas con sus errores (404, 400 y 409), y comprobación de que Libros, Ventas y las bases no son accesibles desde internet. El balanceador reporta el gateway como `healthy`.
+
+La verificación registra una venta de un ejemplar del libro 1, así que sus existencias y el ranking ya no son los de la siembra inicial.
 
 ## Antes de tocar AWS
 
@@ -45,9 +55,15 @@ Nuestro despliegue va en **`us-east-2` (Ohio)**, que estaba vacía, con nombres 
 
 El frontend y el gateway comparten EC2. Solo el gateway publica el puerto 80; el frontend queda interno en la red de Docker.
 
-## Lo que falta en Terraform
+## Qué crea Terraform
 
-`network.tf` (VPC, 2 subredes públicas y 2 privadas, internet gateway, rutas), `security.tf` (grupos según la tabla), `compute.tf` (3 EC2 con IP elástica; AMI desde el parámetro SSM de Amazon Linux 2023), `database.tf` (2 RDS PostgreSQL 16 en subredes privadas con `random_password`), `alb.tf` (balanceador en el 80, target group hacia la EC2 del gateway con chequeo `/health`), y outputs de IPs y endpoints. Los outputs alimentan las variables del despliegue de abajo.
+`network.tf` (VPC, 2 subredes públicas y 2 privadas en dos zonas, internet gateway, rutas), `security.tf` (grupos y reglas según la tabla), `compute.tf` (3 EC2 `t3.small` con IP elástica; AMI de Amazon Linux 2023 desde el parámetro SSM), `database.tf` (2 RDS PostgreSQL 16 en subredes privadas, con `random_password`), `alb.tf` (balanceador en el 80 hacia la EC2 del gateway, con chequeo `/health`) y `ecr.tf`. Los nombres de cada recurso están en [diagrama-despliegue.md](diagrama-despliegue.md#nombres-de-los-recursos).
+
+El `plan` actual crea 55 recursos y no modifica ni destruye ninguno. Las IP, los endpoints y las contraseñas de las bases salen como outputs; el output sensible `exportar_despliegue` produce las variables que espera `scripts/desplegar.sh`:
+
+```
+eval "$(terraform output -raw exportar_despliegue)"
+```
 
 ## Activar el CD
 
@@ -63,11 +79,11 @@ Si la cuenta no deja crear IAM, el flujo ya no lo necesita: usa claves de acceso
 
 ## Orden sugerido
 
-1. `terraform init && terraform apply` con solo ECR (ya funciona) y comprobar que se crean los 4 repositorios.
-2. `scripts/construir-y-subir.sh libros gateway` y verlos en ECR.
-3. Escribir y aplicar red, seguridad, cómputo, RDS y balanceador.
-4. Exportar las variables del despliegue desde los outputs y correr `scripts/desplegar.sh`.
-5. Probar `http://<dns-del-balanceador>/health` y `/api/libros`.
+1. `terraform apply -target=aws_ecr_repository.servicio -target=aws_ecr_lifecycle_policy.servicio` para crear solo los repositorios.
+2. `scripts/construir-y-subir.sh` y comprobar las 4 imágenes en ECR.
+3. `terraform apply` para crear red, seguridad, máquinas, bases y balanceador.
+4. `eval "$(terraform output -raw exportar_despliegue)"` y `scripts/desplegar.sh`.
+5. Probar `http://<balanceador_dns>/health` y `/api/libros`, y correr `scripts/verificar.sh`.
 6. Activar el CD.
 7. Al terminar la calificación: `terraform destroy` y revisar en la consola que no queden instancias, IP elásticas, balanceadores ni bases.
 

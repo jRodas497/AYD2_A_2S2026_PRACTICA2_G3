@@ -10,6 +10,12 @@ variable "proyecto" {
   default     = "ayd-libreria"
 }
 
+variable "vpc_cidr" {
+  description = "Rango de direcciones de la VPC"
+  type        = string
+  default     = "10.20.0.0/16"
+}
+
 variable "servicios" {
   description = "Servicios que se empaquetan como imagen y tienen repositorio en ECR"
   type        = list(string)
