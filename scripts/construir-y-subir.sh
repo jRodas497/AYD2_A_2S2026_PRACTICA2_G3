@@ -4,7 +4,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-REGION="${AWS_REGION:-us-east-1}"
+REGION="${AWS_REGION:-us-east-2}"
 PREFIJO="${ECR_PREFIX:-ayd-libreria}"
 ETIQUETA="${IMAGE_TAG:-$(git rev-parse --short HEAD)}"
 SERVICIOS=("$@")
