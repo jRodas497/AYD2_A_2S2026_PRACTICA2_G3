@@ -1,10 +1,16 @@
 # Diagrama de despliegue
 
-Muestra cómo queda desplegada la Librería AYD en AWS y cómo intervienen Terraform y Ansible.
+Muestra cómo queda desplegada la Librería AYD en AWS y cómo intervienen Terraform y Ansible. Hay dos vistas del mismo despliegue: una general, con los recursos y sus nombres reales, y otra en notación UML.
 
-![Diagrama de despliegue](diagramas/despliegue-p2.svg)
+## Vista general
 
-El archivo editable está en [diagramas/despliegue-p2.drawio](diagramas/despliegue-p2.drawio) y se abre en draw.io.
+![Vista general del despliegue](diagramas/despliegue-p2-vista-general.svg)
+
+## Diagrama UML de despliegue
+
+![Diagrama UML de despliegue](diagramas/despliegue-p2.svg)
+
+El archivo editable de este diagrama está en [diagramas/despliegue-p2.drawio](diagramas/despliegue-p2.drawio) y se abre en draw.io.
 
 ## Componentes
 
@@ -55,26 +61,26 @@ Para quien documente o despliegue de aquí en adelante:
 
 Los nombres que se ven en la consola (etiqueta `Name`) siguen el patrón `ayd-libreria-<componente>`. En Terraform, el código vive en un solo módulo, así que los archivos se refieren entre sí por el nombre del recurso y no por outputs.
 
-| Recurso | Nombre en Terraform | Nombre en AWS | Archivo | Responsable |
-|---|---|---|---|---|
-| VPC | `aws_vpc.main` | `ayd-libreria-vpc` | `network.tf` | Williams |
-| Subredes públicas (2, una por zona) | `aws_subnet.publica[0]`, `[1]` | `ayd-libreria-publica-a`, `-b` | `network.tf` | Williams |
-| Subredes privadas (2, una por zona) | `aws_subnet.privada[0]`, `[1]` | `ayd-libreria-privada-a`, `-b` | `network.tf` | Williams |
-| Balanceador, grupo de seguridad | `aws_security_group.alb` | `ayd-libreria-alb` | `security.tf` | Williams |
-| Gateway y frontend, grupo de seguridad | `aws_security_group.gateway` | `ayd-libreria-gateway` | `security.tf` | Williams |
-| Libros, grupo de seguridad | `aws_security_group.libros` | `ayd-libreria-libros` | `security.tf` | Williams |
-| Ventas, grupo de seguridad | `aws_security_group.ventas` | `ayd-libreria-ventas` | `security.tf` | Williams |
-| Base de Libros, grupo de seguridad | `aws_security_group.db_libros` | `ayd-libreria-db-libros` | `security.tf` | Williams |
-| Base de Ventas, grupo de seguridad | `aws_security_group.db_ventas` | `ayd-libreria-db-ventas` | `security.tf` | Williams |
-| EC2 del gateway y el frontend | `aws_instance.frontend` | `ayd-libreria-frontend` | `compute.tf` | Juan José |
-| EC2 de Libros | `aws_instance.libros` | `ayd-libreria-libros` | `compute.tf` | Juan José |
-| EC2 de Ventas | `aws_instance.ventas` | `ayd-libreria-ventas` | `compute.tf` | Juan José |
-| IP elásticas | `aws_eip.frontend`, `.libros`, `.ventas` | `ayd-libreria-<componente>-eip` | `compute.tf` | Juan José |
-| Base de Libros | `aws_db_instance.libros` | `ayd-libreria-libros-db` | `database.tf` | Juan José |
-| Base de Ventas | `aws_db_instance.ventas` | `ayd-libreria-ventas-db` | `database.tf` | Juan José |
-| Balanceador de carga | `aws_lb.main` | `ayd-libreria-alb` | `alb.tf` | Juan José |
-| Grupo de destino del balanceador | `aws_lb_target_group.gateway` | `ayd-libreria-gateway` | `alb.tf` | Juan José |
-| Repositorios de imágenes | `aws_ecr_repository.servicio["<servicio>"]` | `ayd-libreria/<servicio>` | `ecr.tf` | ya creado |
-| Par de claves SSH | creado con la CLI de AWS | `ayd-libreria` | | ya creado en `us-east-2` |
+| Recurso | Nombre en Terraform | Nombre en AWS | Archivo |
+|---|---|---|---|
+| VPC | `aws_vpc.main` | `ayd-libreria-vpc` | `network.tf` |
+| Subredes públicas (2, una por zona) | `aws_subnet.publica[0]`, `[1]` | `ayd-libreria-publica-a`, `-b` | `network.tf` |
+| Subredes privadas (2, una por zona) | `aws_subnet.privada[0]`, `[1]` | `ayd-libreria-privada-a`, `-b` | `network.tf` |
+| Balanceador, grupo de seguridad | `aws_security_group.alb` | `ayd-libreria-alb` | `security.tf` |
+| Gateway y frontend, grupo de seguridad | `aws_security_group.gateway` | `ayd-libreria-gateway` | `security.tf` |
+| Libros, grupo de seguridad | `aws_security_group.libros` | `ayd-libreria-libros` | `security.tf` |
+| Ventas, grupo de seguridad | `aws_security_group.ventas` | `ayd-libreria-ventas` | `security.tf` |
+| Base de Libros, grupo de seguridad | `aws_security_group.db_libros` | `ayd-libreria-db-libros` | `security.tf` |
+| Base de Ventas, grupo de seguridad | `aws_security_group.db_ventas` | `ayd-libreria-db-ventas` | `security.tf` |
+| EC2 del gateway y el frontend | `aws_instance.frontend` | `ayd-libreria-frontend` | `compute.tf` |
+| EC2 de Libros | `aws_instance.libros` | `ayd-libreria-libros` | `compute.tf` |
+| EC2 de Ventas | `aws_instance.ventas` | `ayd-libreria-ventas` | `compute.tf` |
+| IP elásticas | `aws_eip.frontend`, `.libros`, `.ventas` | `ayd-libreria-<componente>-eip` | `compute.tf` |
+| Base de Libros | `aws_db_instance.libros` | `ayd-libreria-libros-db` | `database.tf` |
+| Base de Ventas | `aws_db_instance.ventas` | `ayd-libreria-ventas-db` | `database.tf` |
+| Balanceador de carga | `aws_lb.main` | `ayd-libreria-alb` | `alb.tf` |
+| Grupo de destino del balanceador | `aws_lb_target_group.gateway` | `ayd-libreria-gateway` | `alb.tf` |
+| Repositorios de imágenes | `aws_ecr_repository.servicio["<servicio>"]` | `ayd-libreria/<servicio>` | `ecr.tf` |
+| Par de claves SSH | creado con la CLI de AWS | `ayd-libreria` | ya creado en `us-east-2` |
 
 Las bases usan el usuario y el nombre de base `libros` y `ventas`, que son los que esperan los roles de Ansible. Las contraseñas las genera `random_password` sin caracteres especiales (RDS rechaza `/`, `@`, `"` y espacios) y no se guardan en el repositorio.
