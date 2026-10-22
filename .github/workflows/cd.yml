@@ -1,0 +1,103 @@
+name: CD
+
+# Se ejecuta cuando CI termina bien en develop, o a mano desde la pestaña Actions.
+# No hace nada hasta que exista la variable de repositorio AWS_DEPLOY_ENABLED=true, así no falla
+# antes de que la infraestructura exista. Variables y secretos necesarios: docs/aws.md.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [develop]
+  workflow_dispatch: {}
+
+concurrency:
+  group: cd
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+  ECR_PREFIX: ${{ vars.ECR_PREFIX || 'ayd-libreria' }}
+  IMAGE_TAG: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+jobs:
+  imagenes:
+    name: Subir ${{ matrix.servicio }} a ECR
+    if: >-
+      vars.AWS_DEPLOY_ENABLED == 'true' &&
+      (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        servicio: [libros, ventas, frontend, gateway]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.IMAGE_TAG }}
+      - name: Sin Dockerfile todavía
+        if: hashFiles(format('servicios/{0}/Dockerfile', matrix.servicio)) == ''
+        run: echo "::notice::servicios/${{ matrix.servicio }} aún no tiene Dockerfile; se omite."
+      - uses: aws-actions/configure-aws-credentials@v4
+        if: hashFiles(format('servicios/{0}/Dockerfile', matrix.servicio)) != ''
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - id: ecr
+        if: hashFiles(format('servicios/{0}/Dockerfile', matrix.servicio)) != ''
+        uses: aws-actions/amazon-ecr-login@v2
+      - uses: docker/setup-buildx-action@v3
+        if: hashFiles(format('servicios/{0}/Dockerfile', matrix.servicio)) != ''
+      - uses: docker/build-push-action@v6
+        if: hashFiles(format('servicios/{0}/Dockerfile', matrix.servicio)) != ''
+        with:
+          context: servicios/${{ matrix.servicio }}
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ steps.ecr.outputs.registry }}/${{ env.ECR_PREFIX }}/${{ matrix.servicio }}:${{ env.IMAGE_TAG }}
+            ${{ steps.ecr.outputs.registry }}/${{ env.ECR_PREFIX }}/${{ matrix.servicio }}:latest
+          cache-from: type=gha,scope=${{ matrix.servicio }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.servicio }}
+
+  despliegue:
+    name: Desplegar con Ansible
+    needs: imagenes
+    runs-on: ubuntu-latest
+    environment: produccion
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.IMAGE_TAG }}
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Instalar Ansible
+        run: |
+          pip install --quiet ansible-core
+          ansible-galaxy collection install -r ansible/requirements.yml
+      - name: Clave SSH
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/ayd.pem
+          chmod 600 ~/.ssh/ayd.pem
+      - name: Desplegar
+        env:
+          SSH_KEY_FILE: ~/.ssh/ayd.pem
+          FRONTEND_IP: ${{ vars.FRONTEND_IP }}
+          LIBROS_IP: ${{ vars.LIBROS_IP }}
+          VENTAS_IP: ${{ vars.VENTAS_IP }}
+          LIBROS_PRIVATE_IP: ${{ vars.LIBROS_PRIVATE_IP }}
+          VENTAS_PRIVATE_IP: ${{ vars.VENTAS_PRIVATE_IP }}
+          LIBROS_DB_HOST: ${{ vars.LIBROS_DB_HOST }}
+          VENTAS_DB_HOST: ${{ vars.VENTAS_DB_HOST }}
+          LIBROS_DB_PASSWORD: ${{ secrets.LIBROS_DB_PASSWORD }}
+          VENTAS_DB_PASSWORD: ${{ secrets.VENTAS_DB_PASSWORD }}
+        run: scripts/desplegar.sh
