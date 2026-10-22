@@ -1,8 +1,62 @@
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
+@theme {
+  /* Curva de salida fuerte: arranca rápido y asienta, se siente más receptiva que ease-out. */
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --radius-ctl: 999px;
+  --radius-fila: 1.25rem;
+  --radius-panel: 1.75rem;
+  --spacing-fila: 0.85rem;
+}
+
+/* Paleta: tinta nocturna con dorado. El dorado solo va en datos y marca; los botones y el foco usan el azul oscuro. */
+:root {
+  --ink: #141b2b;
+  --suave: #5a6275;
+  --brand: #c9a227;
+  --brand-dark: #14213d;
+  --brand-hondo: #0a1226;
+  --marco: #eceef2;
+  --borde: #dde0e7;
+}
+
 @layer base {
   body {
-    @apply bg-crema text-ink;
+    @apply bg-white text-ink antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2 {
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 7vw, 2.75rem);
+    line-height: 1.15;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-dark;
+  }
+
+  /* En pantallas táctiles no hay hover real: evita el flash gris al tocar. */
+  a,
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer components {
+  /* Feedback de pulsación compartido por botones y controles. */
+  .pulsable {
+    @apply transition-[background-color,color,border-color,transform] duration-150 ease-out-strong active:scale-[0.97] motion-reduce:transition-none;
   }
 }
