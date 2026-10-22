@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { BackLink } from '../../../shared/components/BackLink'
 import { Button } from '../../../shared/components/Button'
+import { Portada } from '../../../shared/components/Portada'
 import { PriceTag } from '../../../shared/components/PriceTag'
 import { QuantityStepper } from '../../../shared/components/QuantityStepper'
 import { StockMark } from '../../../shared/components/StockMark'
@@ -48,9 +49,12 @@ export function LibroDetallePage() {
     <div>
       <BackLink to="/" label="Volver al catálogo" />
 
-      <header className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight">{libro.titulo}</h1>
-        <p className="text-base text-suave">{libro.autor}</p>
+      <header className="mb-8 flex items-end gap-5">
+        <Portada id={libro.id} titulo={libro.titulo} className="w-20 h-28 text-4xl" />
+        <div>
+          <h1>{libro.titulo}</h1>
+          <p className="text-base text-suave">{libro.autor}</p>
+        </div>
       </header>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
@@ -70,7 +74,7 @@ export function LibroDetallePage() {
           </dl>
         </section>
 
-        <section aria-labelledby="venta" className="rounded-xl bg-marco p-5">
+        <section aria-labelledby="venta" className="rounded-panel bg-marco p-5">
           <h2 id="venta" className="text-base font-bold mb-4">
             Registrar venta
           </h2>

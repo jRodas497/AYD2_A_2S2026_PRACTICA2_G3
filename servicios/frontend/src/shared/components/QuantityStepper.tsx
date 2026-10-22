@@ -21,7 +21,7 @@ export function QuantityStepper({
   etiqueta,
 }: QuantityStepperProps) {
   return (
-    <div className="inline-flex items-center border border-linea rounded-lg overflow-hidden bg-white">
+    <div className="inline-flex items-center border border-linea rounded-ctl overflow-hidden bg-white">
       <button
         type="button"
         onClick={onDecrementar}

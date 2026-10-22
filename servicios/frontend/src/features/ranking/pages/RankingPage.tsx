@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { Portada } from '../../../shared/components/Portada'
 import { SkeletonRows } from '../../../shared/components/Skeleton'
 import { obtenerRanking, type RankingItem } from '../api/rankingApi'
 
@@ -29,7 +30,7 @@ export function RankingPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold tracking-tight mb-5">Libros más vendidos</h1>
+      <h1 className="mb-5">Libros más vendidos</h1>
 
       {cargando ? (
         <SkeletonRows filas={5} />
@@ -45,12 +46,15 @@ export function RankingPage() {
             <li key={item.libroId}>
               <Link
                 to={`/libros/${item.libroId}`}
-                className="pulsable grid grid-cols-[1.5rem_minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 px-3 py-3 rounded-lg active:scale-[0.99] hover:bg-marco"
+                className="pulsable grid grid-cols-[1.5rem_minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 px-3 py-fila rounded-fila active:scale-[0.99] hover:bg-marco"
               >
                 <span className="text-sm font-semibold text-suave tabular-nums">{indice + 1}</span>
-                <span className="min-w-0">
-                  <span className="block text-sm font-semibold truncate">{item.titulo}</span>
+                <span className="min-w-0 flex items-center gap-3">
+                  <Portada id={item.libroId} titulo={item.titulo} className="w-9 h-12 text-lg" />
+                  <span className="min-w-0">
+                  <span className="block text-base font-semibold truncate">{item.titulo}</span>
                   <span className="block text-sm text-suave truncate">{item.autor}</span>
+                  </span>
                 </span>
                 <span className="text-sm font-semibold tabular-nums text-right whitespace-nowrap">
                   {item.totalVendido} <span className="font-normal text-suave">vendidos</span>

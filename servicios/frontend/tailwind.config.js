@@ -9,15 +9,16 @@ export default {
         sans: ['Manrope', ...defaultTheme.fontFamily.sans],
       },
       colors: {
-        ink: '#22343A',
-        suave: '#5a6b70',
+        ink: 'var(--ink)',
+        suave: 'var(--suave)',
         brand: {
-          DEFAULT: '#35858E',
-          dark: '#276169',
+          DEFAULT: 'var(--brand)',
+          dark: 'var(--brand-dark)',
+          hondo: 'var(--brand-hondo)',
         },
-        // El marco de la app: un paso de tono del verde de la marca; la hoja de trabajo queda en blanco.
-        marco: '#eef3f2',
-        borde: '#e4eae9',
+        // Paleta definida en index.css (tinta nocturna con dorado); aquí solo se nombran los tokens.
+        marco: 'var(--marco)',
+        borde: 'var(--borde)',
         linea: '#cfd4d8',
         ok: '#2e7d32',
         alerta: '#b45309',

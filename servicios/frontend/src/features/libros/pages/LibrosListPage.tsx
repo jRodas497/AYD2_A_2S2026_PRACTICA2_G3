@@ -10,7 +10,7 @@ export function LibrosListPage() {
   return (
     <div>
       <div className="flex items-baseline justify-between gap-4 mb-5">
-        <h1 className="text-2xl font-bold tracking-tight">Catálogo de libros</h1>
+        <h1>Catálogo de libros</h1>
         {!cargando && !error && (
           <p className="text-sm text-suave tabular-nums" aria-live="polite">
             {libros.length} {libros.length === 1 ? 'libro' : 'libros'}
@@ -26,7 +26,7 @@ export function LibrosListPage() {
           aria-label="Buscar por título o autor"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="w-full h-9 border border-linea rounded-lg pl-9 pr-3 text-base sm:text-sm bg-white placeholder:text-suave transition-colors duration-150 focus:border-brand focus:outline-none focus-visible:outline-none focus:ring-2 focus:ring-brand/25"
+          className="w-full h-9 border border-linea rounded-ctl pl-9 pr-3 text-base sm:text-sm bg-white placeholder:text-suave transition-colors duration-150 focus:border-brand-dark focus:outline-none focus-visible:outline-none focus:ring-2 focus:ring-brand-dark/25"
         />
       </div>
 
