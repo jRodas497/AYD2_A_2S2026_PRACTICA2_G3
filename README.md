@@ -59,6 +59,8 @@ curl localhost:9080/api/ventas/ranking
 curl -X POST localhost:9080/api/ventas -H 'Content-Type: application/json' -d '{"libroId":1,"cantidad":2}'
 ```
 
+Para comprobar todo de punta a punta, local o en AWS, está `scripts/verificar.sh [URL]` (por defecto `http://localhost:9080`; en la nube, el DNS del balanceador). Revisa la página, el listado, las búsquedas, el ranking y una venta que lo cambia, y con `LIBROS_IP`, `VENTAS_IP`, `LIBROS_DB_HOST` y `VENTAS_DB_HOST` comprueba que los servicios y las bases no se alcanzan desde fuera.
+
 Los puertos de prueba son 9080 (gateway), 9081 (Libros), 9082 (Ventas), 5433 y 5434 (bases). Para bajar todo y borrar los datos: `docker compose -p ayd-libreria down -v`.
 
 ## Despliegue en AWS
