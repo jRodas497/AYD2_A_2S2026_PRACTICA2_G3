@@ -1,0 +1,3 @@
+# Copiar a terraform.tfvars (ignorado por git) y completar.
+admin_cidr = "203.0.113.7/32"
+key_name   = "ayd-libreria"

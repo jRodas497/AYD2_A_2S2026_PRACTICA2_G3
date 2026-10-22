@@ -1,0 +1,52 @@
+- name: Copiar el esquema de la base
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../servicios/ventas/db/schema.sql"
+    dest: /opt/ayd-ventas-schema.sql
+    mode: "0644"
+
+- name: Aplicar el esquema en la base de Ventas
+  ansible.builtin.command:
+    argv:
+      - docker
+      - run
+      - --rm
+      - -e
+      - PGPASSWORD={{ ventas_db_password }}
+      - -v
+      - /opt/ayd-ventas-schema.sql:/schema.sql:ro
+      - postgres:16-alpine
+      - psql
+      - -h
+      - "{{ ventas_db_host }}"
+      - -U
+      - "{{ ventas_db_user }}"
+      - -d
+      - "{{ ventas_db_name }}"
+      - -v
+      - ON_ERROR_STOP=1
+      - -f
+      - /schema.sql
+  register: esquema
+  retries: 5
+  delay: 10
+  until: esquema.rc == 0
+  changed_when: false
+  no_log: true
+
+- name: Contenedor de Ventas
+  community.docker.docker_container:
+    name: ventas
+    image: "{{ ecr_registry }}/{{ ecr_prefix }}/ventas:{{ image_tag }}"
+    pull: always
+    state: started
+    restart_policy: unless-stopped
+    published_ports:
+      - "8082:8082"
+    env:
+      DB_HOST: "{{ ventas_db_host }}"
+      DB_PORT: "5432"
+      DB_NAME: "{{ ventas_db_name }}"
+      DB_USER: "{{ ventas_db_user }}"
+      DB_PASSWORD: "{{ ventas_db_password }}"
+      LIBROS_URL: "http://{{ libros_private_ip }}:8081"
+  no_log: true

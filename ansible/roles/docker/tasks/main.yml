@@ -1,0 +1,23 @@
+- name: Instalar Docker Engine
+  ansible.builtin.dnf:
+    name: docker
+    state: present
+
+- name: Arrancar Docker y habilitarlo al iniciar
+  ansible.builtin.systemd_service:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Permitir a ec2-user usar Docker
+  ansible.builtin.user:
+    name: ec2-user
+    groups: docker
+    append: true
+
+- name: Iniciar sesión en ECR con el token temporal
+  community.docker.docker_login:
+    registry_url: "{{ ecr_registry }}"
+    username: AWS
+    password: "{{ ecr_token }}"
+  no_log: true

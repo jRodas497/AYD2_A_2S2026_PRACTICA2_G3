@@ -1,0 +1,23 @@
+- name: Docker y acceso a ECR
+  hosts: all
+  become: true
+  roles:
+    - docker
+
+- name: Servicio de Libros
+  hosts: libros
+  become: true
+  roles:
+    - libros
+
+- name: Servicio de Ventas
+  hosts: ventas
+  become: true
+  roles:
+    - ventas
+
+- name: Frontend y gateway
+  hosts: frontend
+  become: true
+  roles:
+    - frontend
