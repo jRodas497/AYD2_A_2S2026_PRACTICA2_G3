@@ -63,6 +63,16 @@ Para comprobar todo de punta a punta, local o en AWS, está `scripts/verificar.s
 
 Los puertos de prueba son 9080 (gateway), 9081 (Libros), 9082 (Ventas), 5433 y 5434 (bases). Para bajar todo y borrar los datos: `docker compose -p ayd-libreria down -v`.
 
+## Pruebas
+
+| Dónde | Qué prueba | Cómo correrlas |
+|---|---|---|
+| `servicios/libros` y `servicios/ventas` | Servicios con Mockito, controladores con MockMvc (códigos 201, 400, 404 y 409, y validaciones) y, en Ventas, el cliente HTTP contra un servidor de Libros simulado | `mvn verify` dentro de cada carpeta (JDK 21) |
+| `servicios/frontend` | Componentes y pantallas con Vitest y Testing Library, y las utilidades de formato y errores | `npm test` (Node 22) |
+| Toda la plataforma | Flujo completo contra el sistema en marcha | `scripts/verificar.sh [URL]` |
+
+El CI corre las tres primeras en cada push. Ninguna necesita base de datos: la consulta de búsqueda con `unaccent` de Libros solo se comprueba con `scripts/verificar.sh`, porque depende de PostgreSQL.
+
 ## Despliegue en AWS
 
 Terraform crea la infraestructura, las imágenes se construyen y se suben a ECR, y Ansible configura las máquinas y levanta los contenedores. El orden, las variables y la activación del CD están en [docs/aws.md](docs/aws.md).
